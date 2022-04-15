@@ -7,7 +7,11 @@
     require_once ('./services/dbconfig.php');
     require_once ('./models/User.php');
 
-    $user = new User();
-    $user->defineUser(1);
+    $user = new User(1);
+    $user->defineSelf();
+    $user->expandSelf();
     print_r($user);
-	echo "ggg";
+
+    $task = $user->tasks[0];
+    $task->expandSelf();
+    print_r($task);
