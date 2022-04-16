@@ -1,6 +1,7 @@
 <?php
 
 require_once (__DIR__.'/../services/dbconfig.php');
+require_once ('User.php');
 
 class Task
 {
@@ -92,6 +93,19 @@ class Task
         }
 
         return $repeats;
+    }
 
+    function attachUser($id){
+        global $link;
+        $result = mysqli_query($link, "SELECT * FROM users_tasks WHERE user_id=$id AND task_id=$this->id");
+        $result = mysqli_fetch_assoc($result);
+        if ($result == null) {
+            mysqli_query($link, "INSERT INTO users_tasks (user_id, task_id) VALUES ($id, $this->id)");
+        }
+    }
+
+    function detachUser($id){
+        global $link;
+        mysqli_query($link, "DELETE FROM users_tasks WHERE user_id=$id AND task_id=$this->id");
     }
 }

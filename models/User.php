@@ -52,4 +52,18 @@ class User
         mysqli_query($link, "INSERT into users (name) VALUES (" . mysqli_real_escape_string($link, $this->name) . ")");
     }
 
+    function attachTask($id){
+        global $link;
+        $result = mysqli_query($link, "SELECT * FROM users_tasks WHERE user_id=$this->id AND task_id=$id");
+        $result = mysqli_fetch_assoc($result);
+        if ($result == null) {
+            mysqli_query($link, "INSERT INTO users_tasks (user_id, task_id) VALUES ($this->id, $id)");
+        }
+    }
+
+    function detachTask($id){
+        global $link;
+        mysqli_query($link, "DELETE FROM users_tasks WHERE user_id=$this->id AND task_id=$id");
+    }
+
 }
