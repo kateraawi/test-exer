@@ -20,7 +20,7 @@ class User
         $result = mysqli_fetch_assoc($result);
         $this->id = $result['id'];
         $this->name = $result['name'];
-        $this->getTasks();
+        $this->tasks = $this->getTasks();
     }
 
     private function getJoined(){
@@ -34,7 +34,7 @@ class User
         while ($row = mysqli_fetch_assoc($result)){
             array_push($tasks, $row['task_id']);
         }
-        $this->tasks = $tasks;
+        return $tasks;
     }
 
     function expandSelf(){
