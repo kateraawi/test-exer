@@ -14,56 +14,64 @@ class User
        $this->name = $name;
     }
 
-    function defineSelf(){
-        global $link;
-        $result = mysqli_query($link, "SELECT * FROM users WHERE id = $this->id");
+    function dbConstruct(){
+        global $connection;
+        $result = mysqli_query($connection, "SELECT * FROM users WHERE id = $this->id");
         $result = mysqli_fetch_assoc($result);
         $this->id = $result['id'];
         $this->name = $result['name'];
         $this->tasks = $this->getTasks();
     }
 
-    private function getJoined(){
-        global $link;
-        return mysqli_query($link, "SELECT * FROM users INNER JOIN users_tasks ON users.id = users_tasks.user_id AND users.id = $this->id  INNER JOIN tasks ON tasks.id = users_tasks.task_id");
-    }
-
     private function getTasks(){
+        global $connection;
         $tasks = [];
-        $result = $this->getJoined();
-        while ($row = mysqli_fetch_assoc($result)){
-            array_push($tasks, $row['task_id']);
+        $stmt = $connection->prepare(file_get_contents(__DIR__.'/../SQL/getJoinedTasksFromUser.sql'));
+        $stmt->bind_param("i", $this->id);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()){
+            array_push($tasks, $row['user_id']);
         }
+
         return $tasks;
     }
 
-    function expandSelf(){
-        $tasks = [];
-        foreach ($this->tasks as $taskID) {
-            $task = new Task($taskID);
-            $task->defineSelf();
-            array_push($tasks, $task);
-        }
-        $this->tasks = $tasks;
-    }
-
     function addSelf() {
-        global $link;
-        mysqli_query($link, "INSERT into users (name) VALUES (" . mysqli_real_escape_string($link, $this->name) . ")");
+        global $connection;
+        try {
+            $connection->begin_transaction();
+            $stmt = $connection->prepare(file_get_contents(__DIR__ . '/../SQL/addUser.sql'));
+            $stmt->bind_param("s", $this->name);
+            $stmt->execute();
+        } catch (Exception $e) {
+            $connection->rollBack();
+            echo "Ошибка: " . $e->getMessage();
+        }
+
     }
 
-    function attachTask($id){
-        global $link;
-        $result = mysqli_query($link, "SELECT * FROM users_tasks WHERE user_id=$this->id AND task_id=$id");
+    function addTask($taskId){
+        global $connection;
+        $result = mysqli_query($connection, "SELECT * FROM users_tasks WHERE user_id=$this->id AND task_id=$taskId");
         $result = mysqli_fetch_assoc($result);
         if ($result == null) {
-            mysqli_query($link, "INSERT INTO users_tasks (user_id, task_id) VALUES ($this->id, $id)");
+            mysqli_query($connection, "INSERT INTO users_tasks (user_id, task_id) VALUES ($this->id, $taskId)");
         }
     }
 
-    function detachTask($id){
-        global $link;
-        mysqli_query($link, "DELETE FROM users_tasks WHERE user_id=$this->id AND task_id=$id");
+    function unlinkTask($taskId){
+        global $connection;
+        try {
+            $connection->begin_transaction();
+            $stmt = $connection->prepare("DELETE FROM users_tasks WHERE user_id=$this->id AND task_id=$taskId");
+            $stmt->execute();
+            $connection->commit();
+        } catch (Exception $e) {
+            $connection->rollBack();
+            echo "Ошибка: " . $e->getMessage();
+        }
+
     }
 
 }
