@@ -13,5 +13,9 @@
 
     $task = new Task(1);
     $task->dbConstruct();
-    print_r($task);
+    //print_r($task);
+    $task->users = [1, 5, 7];
+    $task->description = "Задание №1";
+    $task->updateSelf();
+    print_r($task->getAll());
 

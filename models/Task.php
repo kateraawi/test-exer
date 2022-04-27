@@ -75,6 +75,33 @@ class Task
         return $repeats;
     }
 
+    function getAll()
+    {
+        global $connection;
+        try {
+
+            $tasks = [];
+
+            $connection->begin_transaction();
+            $stmt = $connection->prepare("SELECT * FROM tasks");
+
+            $stmt->execute();
+
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()){
+                $task = new Task($row['id']);
+                $task->dbConstruct();
+                array_push($tasks, $task);
+            }
+
+            return $tasks;
+
+        } catch (Exception $e) {
+            $connection->rollBack();
+            echo "Ошибка: " . $e->getMessage();
+        }
+    }
+
     function addSelf()
     {
         global $connection;
@@ -90,9 +117,62 @@ class Task
 
     }
 
+    function updateSelf()
+    {
+        global $connection;
+
+        try {
+            $connection->begin_transaction();
+            $stmt = $connection->prepare(file_get_contents(__DIR__ . '/../SQL/updateTask.sql'));
+            $stmt->bind_param("sssiiii", $this->description, $this->do_from, $this->do_to, $this->period_days, $this->period_quantity, $this->completed, $this->id);
+            $stmt->execute();
+
+            $inBaseUsers = [];
+            $stmt = $connection->prepare("SELECT * FROM users_tasks WHERE task_id=?");
+            $stmt->bind_param('i', $this->id);
+            $stmt->execute();
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()){
+                array_push($inBaseUsers, $row['user_id']);
+            }
+
+            foreach ($inBaseUsers as $userId) {
+                $this->unlinkUser($userId);
+            }
+
+            foreach ($this->users as $userId) {
+                $this->addUser($userId);
+            }
+
+            $connection->commit();
+
+            $this->getUsers();
+
+        } catch (Exception $e) {
+            $connection->rollBack();
+            echo "Ошибка: " . $e->getMessage();
+        }
+    }
+
+    function deleteSelf()
+    {
+        global $connection;
+
+        try {
+            $connection->begin_transaction();
+            $stmt = $connection->prepare("DELETE FROM tasks WHERE id=$this->id");
+            $stmt->execute();
+            $connection->commit();
+        } catch (Exception $e) {
+            $connection->rollBack();
+            echo "Ошибка: " . $e->getMessage();
+        }
+    }
+
     function addUser($user_id)
     {
         global $connection;
+
         $result = mysqli_query($connection, "SELECT * FROM users_tasks WHERE user_id=$user_id AND task_id=$this->id");
         $result = mysqli_fetch_assoc($result);
         if ($result === null) {
@@ -109,6 +189,13 @@ class Task
             $stmt = $connection->prepare("DELETE FROM users_tasks WHERE user_id=$user_id AND task_id=$this->id");
             $stmt->execute();
             $connection->commit();
+
+            /*if(in_array($user_id, $this->users)) {
+                foreach (array_keys($this->users, $user_id, true) as $key) {
+                    unset($this->users[$key]);
+                }
+            }*/
+
         } catch (Exception $e) {
             $connection->rollBack();
             echo "Ошибка: " . $e->getMessage();
@@ -116,3 +203,8 @@ class Task
 
     }
 }
+
+//getAll
+//delete
+//update
+//фамилии
