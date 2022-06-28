@@ -1,6 +1,6 @@
 <?php
 
-require_once (__DIR__.'/../services/dbconfig.php');
+require_once (__DIR__.'/../dbconfig.php');
 require_once ('Task.php');
 
 class User
@@ -31,10 +31,37 @@ class User
         $stmt->execute();
         $result = $stmt->get_result();
         while ($row = $result->fetch_assoc()){
-            array_push($tasks, $row['user_id']);
+            array_push($tasks, $row['task_id']);
         }
 
         return $tasks;
+    }
+
+    public function getAll()
+    {
+        global $connection;
+        try {
+
+            $users = [];
+
+            $connection->begin_transaction();
+            $stmt = $connection->prepare("SELECT * FROM users");
+
+            $stmt->execute();
+
+            $result = $stmt->get_result();
+            while ($row = $result->fetch_assoc()){
+                $user = new User($row['id']);
+                $user->dbConstruct();
+                array_push($users, $user);
+            }
+
+            return $users;
+
+        } catch (Exception $e) {
+            $connection->rollBack();
+            echo "Ошибка: " . $e->getMessage();
+        }
     }
 
     function addSelf() {
@@ -44,6 +71,7 @@ class User
             $stmt = $connection->prepare(file_get_contents(__DIR__ . '/../SQL/addUser.sql'));
             $stmt->bind_param("s", $this->name);
             $stmt->execute();
+            $connection->commit();
         } catch (Exception $e) {
             $connection->rollBack();
             echo "Ошибка: " . $e->getMessage();
