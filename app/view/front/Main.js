@@ -27,6 +27,7 @@ Ext.define('MyApp.view.front.Main', {
             columnWidth: 0.7,
             items: [
                 {xtype:'newMainTaskList'},
+                {xtype: 'MainLoginForm'}
                 //{xtype:'form-date'}
             ]
         },
@@ -121,6 +122,37 @@ Ext.define('MyApp.view.front.TaskList', {
     bbar: [
         '@add'
     ]
+});
+
+Ext.define('MyApp.view.front.LoginForm', {
+    xtype: 'MainLoginForm',
+
+    extend: 'Ext.window.Window',
+    alias: 'widget.loginform',
+    controller: 'maincontroller',
+    requires: ['MyApp.view.front.MainController'],
+    title: 'Логин',
+    layout: 'fit',
+    autoShow: true,
+
+    initComponent: function() {
+        this.items = [{
+            xtype: 'form',
+            items: [{
+                xtype: 'numberfield',
+                name: 'userId',
+                fieldLabel: 'ID'
+                },
+                {
+                    xtype: 'button',
+                    text: 'Вход',
+                    handler: 'onLoginClick'
+                }
+            ],
+        }];
+
+        this.callParent(arguments);
+    }
 });
 
 Ext.define('MyApp.view.front.TaskForm', {

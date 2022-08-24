@@ -1,4 +1,5 @@
 Ext.define('MyApp.view.front.MainController', {
+
     extend: 'Ext.app.ViewController',
     alias: 'controller.maincontroller',
 
@@ -17,6 +18,38 @@ Ext.define('MyApp.view.front.MainController', {
             return 'Buy stock';
         }
     },*/
+
+    onLoginClick: function(button) {
+        const win = button.up('window');
+        const form = win.down('form');
+        //const rec = grid.getStore().getAt(rowIndex);
+        //const view = Ext.widget('loginform');
+        //view.down('form').loadRecord(rec);
+        let values = form.getForm().getValues();
+        const userId = values.userId;
+
+        MyApp.config.Globals.setUserId(parseInt(userId));
+        //console.log(MyApp.config.Globals.userId);
+        //win.close();
+        Ext.getCmp('taskListGridId').getStore().load({params: {user_id: MyApp.config.Globals.getUserId()}});
+
+        //Ext.getCmp('taskListGridId').getStore().load();
+
+        /*Ext.Ajax.request({
+            url: 'http://localhost:80/PHPStormProjects/test-exer/api/api.php?act=User&method=getTasks',
+            method: 'POST',
+            params: {
+                'userId': userId,
+            },
+            success: function(response, options){
+                Ext.Msg.alert('Успех', 'Успех');
+
+            },
+            failure: function(response, options){
+                alert("Ошибка: " + response.statusText);
+            }
+        });*/
+    },
 
     onEditClick: function(grid, rowIndex, colIndex) {
         const rec = grid.getStore().getAt(rowIndex);
@@ -139,7 +172,6 @@ Ext.define('MyApp.view.front.MainController', {
         //alert(groupId);
 
         if((groupId === 0 && confirm('Вы действительно хотите удалить задачу?')) || (groupId !== 0 && confirm('Это элемент переодической задачи. При удалении не с конца, задача разделится на две другие периодические. Вы действительно хотите его удалить?'))){
-            //console.log(123);
             Ext.Ajax.request({
                 url: 'http://localhost:80/PHPStormProjects/test-exer/api/api.php?act=Task&method=deleteSelf',
                 method:'POST',

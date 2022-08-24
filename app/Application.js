@@ -5,8 +5,9 @@
  */
 Ext.define('MyApp.Application', {
     extend: 'Ext.app.Application',
-
     name: 'MyApp',
+
+    requires: ['MyApp.config.Globals'],
 
     quickTips: false,
     platformConfig: {
@@ -21,6 +22,7 @@ Ext.define('MyApp.Application', {
 
     launch: function () {
         // TODO - Launch the application
+
     },
 
     onAppUpdate: function () {

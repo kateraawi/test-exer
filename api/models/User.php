@@ -23,15 +23,24 @@ class User
         $this->tasks = $this->getTasks();
     }
 
-    private function getTasks(){
+    public function getTasks($request = null){
         global $connection;
+
+        if ($request) {
+            $this->id = (int)$request['user_id'];
+        }
+
         $tasks = [];
+
         $stmt = $connection->prepare(file_get_contents(__DIR__.'/../SQL/getJoinedTasksFromUser.sql'));
         $stmt->bind_param("i", $this->id);
         $stmt->execute();
         $result = $stmt->get_result();
+
         while ($row = $result->fetch_assoc()){
-            array_push($tasks, $row['task_id']);
+            $task = new Task($row['task_id']);
+            $task->dbConstruct();
+            array_push($tasks, $task);
         }
 
         return $tasks;

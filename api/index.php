@@ -7,7 +7,7 @@
     require_once (__DIR__ . "/services/dbconfig.php");
     require_once (__DIR__ . '/models/User.php');
 
-    $user = new User(null, 'Аааа А. А.');
+    //$user = new User(null, 'Аааа А. А.');
     //$user->addSelf();
 
     //$task = new Task(null, 'Задача 9', '2023-04-05','2023-04-06', 5, 4, 0);

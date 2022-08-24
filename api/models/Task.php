@@ -431,13 +431,25 @@ class Task
         }
     }
 
-    function addUserGroup($user_id)
+    function addUserGroup($request = null, $user_id = null)
     {
         global $connection;
         $connection->begin_transaction();
+        //var_dump($user_id);
+        if ($request){
+            $task = new Task($request['task_id']);
+            $task->dbConstruct();
+            $group_id = $task->group_id;
+            $user_id = $request['user_id'];
+        } else {
+            $group_id = $this->group_id;
+            if ($user_id === null){
+                return;
+            }
+        }
 
         $stmt = $connection->prepare(file_get_contents(__DIR__ . '/../SQL/selectByGroupId.sql'));
-        $stmt->bind_param("i", $this->group_id);
+        $stmt->bind_param("i", $group_id);
         $stmt->execute();
         $result = $stmt->get_result();
 
