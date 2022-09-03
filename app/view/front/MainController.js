@@ -105,7 +105,7 @@ Ext.define('MyApp.view.front.MainController', {
             });
         }
 
-        Ext.getCmp('taskListGridId').getStore().load();
+        Ext.getCmp('taskListGridId').getStore().load({params: {user_id: MyApp.config.Globals.getUserId()}});
 
     },
 
@@ -114,7 +114,7 @@ Ext.define('MyApp.view.front.MainController', {
     },
 
     onSaveAddClick: function(button) {
-        var win    = button.up('window'),
+        let win    = button.up('window'),
             form   = win.down('form'),
             values = form.getValues();
         //console.log(values);
@@ -131,7 +131,7 @@ Ext.define('MyApp.view.front.MainController', {
                     'do_to':values.do_to,
                 },
                 success: function(response, options){
-                    Ext.getCmp('taskListGridId').getStore().load();
+                    Ext.getCmp('taskListGridId').getStore().load({params: {user_id: MyApp.config.Globals.getUserId()}});
                     Ext.Msg.alert('Успех', 'Успех');
                 },
                 failure: function(response, options){
@@ -153,7 +153,7 @@ Ext.define('MyApp.view.front.MainController', {
                 },
 
                 success: function(response, options){
-                    Ext.getCmp('taskListGridId').getStore().load();
+                    Ext.getCmp('taskListGridId').getStore().load({params: {user_id: MyApp.config.Globals.getUserId()}});
                     Ext.Msg.alert('Успех', 'Успех');
                 },
 
@@ -179,7 +179,7 @@ Ext.define('MyApp.view.front.MainController', {
                     'id':rec.get('id')
                 },
                 success: function(response, options){
-                    Ext.getCmp('taskListGridId').getStore().load();
+                    Ext.getCmp('taskListGridId').getStore().load({params: {user_id: MyApp.config.Globals.getUserId()}});
                 },
                 failure: function(response, options){
                     alert("Ошибка: " + response.statusText);
@@ -189,7 +189,7 @@ Ext.define('MyApp.view.front.MainController', {
     },
 
     onCompleteClick: function(grid, rowIndex, colIndex) {
-        var rec = grid.getStore().getAt(rowIndex);
+        let rec = grid.getStore().getAt(rowIndex);
         Ext.Msg.alert('Completed/Uncompleted', 'Completed/Uncompleted ' + rec.get('description') + ' (' + rec.get('id') + ')');
 
         Ext.Ajax.request({
@@ -199,7 +199,7 @@ Ext.define('MyApp.view.front.MainController', {
                 'id':rec.get('id')
             },
             success: function(response, options){
-                Ext.getCmp('taskListGridId').getStore().load();
+                Ext.getCmp('taskListGridId').getStore().load({params: {user_id: MyApp.config.Globals.getUserId()}});
             },
             failure: function(response, options){
                 alert("Ошибка: " + response.statusText);
