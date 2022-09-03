@@ -4,16 +4,21 @@
     ini_set('display_startup_errors', '1');
     error_reporting(E_ALL);
 
-    require_once (__DIR__ . "/services/dbconfig.php");
-    require_once (__DIR__ . '/models/User.php');
+    require_once (__DIR__ . "/dbconfig.php");
+    require_once (__DIR__ . '/models/Task.php');
+
+
+    global $em;
+    $task = $em->find('Task', 326);
+    print_r($task->users);
 
     //$user = new User(null, 'Аааа А. А.');
     //$user->addSelf();
 
     //$task = new Task(null, 'Задача 9', '2023-04-05','2023-04-06', 5, 4, 0);
-    $task = new Task(267);
-    $task->dbConstruct();
-    print_r($task);
+    //$task = new Task(267);
+    //$task->dbConstruct();
+    //print_r($task);
     //$task->description = 'safdsf';
     //$task->updateSelf();
     //$task->dbConstruct();

@@ -1,37 +1,97 @@
 <?php
 
 require_once (__DIR__.'/../dbconfig.php');
+require_once (__DIR__.'/../vendor/autoload.php');
 require_once ('User.php');
 
+use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
+
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="tasks")
+ */
 class Task
 {
+
+    /**
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue
+     */
     public $id;
+
+    /**
+     * @ORM\Column(name="`descr`", type="string")
+     */
     public $description;
+
+
+    /**
+     * @ORM\Column(type="string")
+     */
     public $do_from;
+
+    /**
+     * @ORM\Column(type="string")
+     */
     public $do_to;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
     public $period_days;
+
+    /** @ORM\Column(name="period_qua", type="integer") */
     public $period_quantity;
+
+    /** @ORM\Column(type="integer") */
     public $completed;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
     public $group_id;
+
+    /**
+     * @ORM\ManyToMany(targetEntity="User")
+     * @ORM\JoinTable(name="users_tasks")
+     */
     public $users;
+
     public $repeats;
 
-    function __construct($id = null, $description  = null, $do_from  = null, $do_to = null, $period_days  = null, $period_quantity  = null, $completed = 0, $group_id = null, $users = [])
+    function __construct()
     {
-        $this->id = $id;
+        $this->users = new ArrayCollection();
+    }
+
+    function setDescription($description)
+    {
         $this->description = $description;
+    }
+
+    function setPeriod($do_from, $do_to, $period_days, $period_quantity)
+    {
         $this->do_from = $do_from;
         $this->do_to = $do_to;
         $this->period_days = $period_days;
         $this->period_quantity = $period_quantity;
+    }
+
+    function setCompleted($completed)
+    {
         $this->completed = $completed;
+    }
+
+    function setGroupId($group_id)
+    {
         $this->group_id = $group_id;
-        $this->users = $users;
     }
 
     function dbConstruct()
     {
-        global $connection;
+        /*global $connection;
         $result = mysqli_query($connection, "SELECT * FROM tasks WHERE id = $this->id");
         $result = mysqli_fetch_assoc($result);
         $this->id = $result['id'];
@@ -43,12 +103,12 @@ class Task
         $this->completed = $result['completed'];
         $this->group_id = $result['group_id'];
         $this->users = $this->getUsers();
-        $this->repeats = $this->getRepeatedPeriods();
+        $this->repeats = $this->getRepeatedPeriods();*/
     }
 
     private function getUsers()
     {
-        global $connection;
+        /*global $connection;
         $users = [];
         $stmt = $connection->prepare(file_get_contents(__DIR__.'/../SQL/getJoinedUsersFromTask.sql'));
         $stmt->bind_param("i", $this->id);
@@ -57,8 +117,9 @@ class Task
         while ($row = $result->fetch_assoc()){
             array_push($users, $row['user_id']);
         }
+        */
 
-        return $users;
+        return $this->users;
     }
 
     public function getRepeatedPeriods()
@@ -83,9 +144,36 @@ class Task
         return $repeats;
     }
 
+    private function getNewGroupId()
+    {
+        global $em;
+
+        return $em->createQueryBuilder()->select('MAX(t.group_id)')
+                ->from('Task', 't')
+                ->getQuery()
+                ->getSingleScalarResult() + 1;
+    }
+
+    public function getSelfGroup()
+    {
+        global $em;
+
+        return $em->createQueryBuilder()
+            ->select('t')
+            ->from('Task', 't')
+            ->where("t.group_id = $this->group_id")
+            ->getQuery()
+            ->getResult();
+    }
+
     public function getAll()
     {
-        global $connection;
+        global $em;
+        return $em->createQueryBuilder()->select('t')
+            ->from('Task', 't')
+            ->getQuery()
+            ->getResult();
+        /*global $connection;
         try {
 
             $tasks = [];
@@ -107,12 +195,26 @@ class Task
         } catch (Exception $e) {
             $connection->rollBack();
             echo "Ошибка: " . $e->getMessage();
-        }
+        }*/
     }
 
     function addSelf($request = null)
     {
-        global $connection;
+        global $em;
+
+        if ($request) {
+            $this->description = $request['description'];
+            $this->do_from = date('Y-m-d', strtotime($request['do_from']));
+            $this->do_to = date('Y-m-d', strtotime($request['do_to']));
+            $this->period_days = 0;
+            $this->period_quantity = 0;
+            $this->completed = 0;
+        }
+
+        $em->persist($this);
+        $em->flush();
+
+        /*global $connection;
         try {
 
             if ($request) {
@@ -142,12 +244,34 @@ class Task
         } catch (Exception $e) {
             $connection->rollBack();
             echo "Ошибка: " . $e->getMessage();
-        }
+        }*/
 
     }
 
     function addSelfGroup($request = null) {
-        global $connection;
+
+        global $em;
+
+        if ($request) {
+            $this->description = $request['description'];
+            $this->do_from = date('Y-m-d', strtotime($request['do_from']));
+            $this->do_to = date('Y-m-d', strtotime($request['do_to']));
+            $this->period_days = (int)$request['period_days'];
+            $this->period_quantity = (int)$request['period_quantity'];
+        }
+
+        foreach ($this->getRepeatedPeriods() as $period){
+
+            $task = new Task();
+            $task->setDescription($this->description);
+            $task->setPeriod($period[0], $period[1], $this->period_days, $this->period_quantity);
+            $task->setCompleted(0);
+            $task->setGroupId($this->getNewGroupId());
+
+            $task->addSelf();
+        }
+
+        /*global $connection;
         try {
 
             if ($request) {
@@ -176,12 +300,25 @@ class Task
         } catch (Exception $e) {
             $connection->rollBack();
             echo "Ошибка: " . $e->getMessage();
-        }
+        }*/
     }
 
     function updateSelf($request = null)
     {
-        global $connection;
+
+        global $em;
+
+        if ($request) {
+            $this->id = $request['id'];
+            $this->description = $request['description'];
+        }
+
+        $thisTask = $em->find('Task', $this->id);
+        $thisTask->setDescription($this->description);
+        $thisTask->persist();
+        $thisTask->flush();
+
+        /*global $connection;
 
         try {
 
@@ -231,12 +368,28 @@ class Task
         } catch (Exception $e) {
             $connection->rollBack();
             echo "Ошибка: " . $e->getMessage();
-        }
+        }*/
     }
 
     public function updateSelfGroup($request = null)
     {
-        global $connection;
+
+        global $em;
+
+        if ($request) {
+            $this->id = $request['id'];
+            $this->description = $request['description'];
+            $this->period_quantity = $request['period_quantity'];
+        }
+
+        $thisTask = $em->find('Task', $this->id);
+
+        if ($this->period_quantity < $thisTask->period_quantity) {
+            $group = $thisTask->getSelfGroup();
+            $delArr = array_slice($group, $this->period_quantity - $thisTask->period_quantity);
+        }
+
+        /*global $connection;
         try {
 
             if ($request) {
@@ -309,24 +462,84 @@ class Task
         } catch (Exception $e){
             $connection->rollBack();
             echo "Ошибка: " . $e->getMessage();
-        }
+        }*/
 
     }
 
     function completeSelf($request = null)
     {
-        if ($request) {
+        global $em;
+        $this->setCompleted(1);
+        $em->persist($this);
+        $em->flush();
+
+    /*    if ($request) {
           $this->id = (int)$request['id'];
           $this->dbConstruct();
         }
 
         $this->completed = (int)!boolval($this->completed);
-        $this->updateSelf();
+        $this->updateSelf();*/
     }
 
     function deleteSelf($request = null)
     {
-        global $connection;
+        global $em;
+
+        if ($request) {
+            $this->id = (int)$request['id'];
+        }
+
+        $thisTask = $em->find('Task', $this->id);
+
+        if ($thisTask->group_id !== null){
+            $group = $thisTask->getSelfGroup();
+
+            if ($thisTask->id !== $group[0]->id){
+
+                $foundPositionInGroup = false;
+                $oldGroup = [];
+
+                foreach ($group as $elementKey => $task) {
+
+                    if (!$foundPositionInGroup) {
+                        if ($task->id !== $thisTask->id) $oldGroup[] = $task;
+                        unset($group[$elementKey]);
+                    }
+
+                    if ($task->id === $thisTask->id) {
+                        $foundPositionInGroup = true;
+                    }
+
+                }
+
+                $em->remove($thisTask);
+                $groupId = $this->getNewGroupId();
+
+                foreach ($group as $elementKey => $task) {
+                    $task->setGroupId($groupId);
+                    $task->setPeriod($task->do_from, $task->do_to, $task->period_days, count($group));
+                    $em->persist($task);
+                }
+
+                foreach ($oldGroup as $elementKey => $task) {
+                    $task->setPeriod($task->do_from, $task->do_to, $task->period_days, count($oldGroup));
+                    $em->persist($task);
+                }
+
+            } else {
+                $em->remove($thisTask);
+            }
+            $em->flush();
+        }
+
+        return [$oldGroup, $group];
+
+        //$em->remove($task);
+        //$em->flush();
+
+
+        /*global $connection;
 
         try {
             $connection->begin_transaction();
@@ -413,12 +626,18 @@ class Task
         } catch (Exception $e) {
             $connection->rollBack();
             echo "Ошибка: " . $e->getMessage();
-        }
+        }*/
     }
 
-    function addUser($user_id)
+    function addUser($request)
     {
-        global $connection;
+        global $em;
+
+        $user = $em->find('User', $request['user_id']);
+        $task = $em->find('Task', $request['task_id']);
+        $user->addTask(["task_id"=>$task->id, "user_id"=>$user->id]);
+
+        /*global $connection;
 
         $result = mysqli_query($connection, "SELECT * FROM users_tasks WHERE user_id=$user_id AND task_id=$this->id");
         $result = mysqli_fetch_assoc($result);
@@ -428,12 +647,12 @@ class Task
             $stmt->bind_param("ii", $user_id, $this->id);
             $stmt->execute();
             $connection->commit();
-        }
+        }*/
     }
 
     function addUserGroup($request = null, $user_id = null)
     {
-        global $connection;
+       /* global $connection;
         $connection->begin_transaction();
         //var_dump($user_id);
         if ($request){
@@ -459,12 +678,12 @@ class Task
             $task->addUser($user_id);
         }
 
-        $connection->commit();
+        $connection->commit();*/
     }
 
     function unlinkUser($user_id)
     {
-        global $connection;
+       /* global $connection;
 
         try {
             $connection->begin_transaction();
@@ -478,7 +697,7 @@ class Task
         } catch (Exception $e) {
             $connection->rollBack();
             echo "Ошибка: " . $e->getMessage();
-        }
+        }*/
 
     }
 }

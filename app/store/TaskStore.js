@@ -2,7 +2,7 @@ Ext.define('MyApp.store.TaskStore',{
     requires: ['MyApp.config.Globals'],
     extend: 'Ext.data.Store',
     model: 'MyApp.model.Task',
-    autoLoad: false,
+    autoLoad: true,
     alias: 'store.taskstore',
 
     proxy: {
