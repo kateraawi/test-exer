@@ -23,7 +23,7 @@ class User
      * @ORM\JoinTable(name="users_tasks")
      * @ORM\JoinColumn(name="task_id", referencedColumnName="id")
      */
-    private $tasks  = null;
+    public $tasks = null;
 
     function __construct(){
 

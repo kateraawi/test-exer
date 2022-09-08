@@ -70,7 +70,7 @@ Ext.define('MyApp.view.front.MainController', {
 
         if (groupId === 0){
             Ext.Ajax.request({
-                url: 'http://localhost:80/PHPStormProjects/test-exer/api/api.php?act=Task&method=updateSelf',
+                url: 'http://localhost:80/PHPStormProjects/test-exer/api/api.php?act=TaskController&method=updateTask',
                 method: 'POST',
                 params: {
                     'id': values.id,
@@ -87,7 +87,7 @@ Ext.define('MyApp.view.front.MainController', {
             });
         } else {
             Ext.Ajax.request({
-                url: 'http://localhost:80/PHPStormProjects/test-exer/api/api.php?act=Task&method=updateSelfGroup',
+                url: 'http://localhost:80/PHPStormProjects/test-exer/api/api.php?act=TaskController&method=updateTaskGroup',
                 method: 'POST',
                 params: {
                     'id': values.id,
@@ -123,7 +123,7 @@ Ext.define('MyApp.view.front.MainController', {
         if(values.period_quantity === '' || parseInt(values.period_quantity) === 1){
 
             Ext.Ajax.request({
-                url: 'http://localhost:80/PHPStormProjects/test-exer/api/api.php?act=Task&method=addSelf',
+                url: 'http://localhost:80/PHPStormProjects/test-exer/api/api.php?act=TaskController&method=addTask',
                 method: 'POST',
                 params: {
                     'description':values.description,
@@ -142,7 +142,7 @@ Ext.define('MyApp.view.front.MainController', {
         } else {
 
             Ext.Ajax.request({
-                url: 'http://localhost:80/PHPStormProjects/test-exer/api/api.php?act=Task&method=addSelfGroup',
+                url: 'http://localhost:80/PHPStormProjects/test-exer/api/api.php?act=TaskController&method=addTaskGroup',
                 method: 'POST',
                 params: {
                     'description':values.description,
@@ -173,7 +173,7 @@ Ext.define('MyApp.view.front.MainController', {
 
         if((groupId === 0 && confirm('Вы действительно хотите удалить задачу?')) || (groupId !== 0 && confirm('Это элемент переодической задачи. При удалении не с конца, задача разделится на две другие периодические. Вы действительно хотите его удалить?'))){
             Ext.Ajax.request({
-                url: 'http://localhost:80/PHPStormProjects/test-exer/api/api.php?act=Task&method=deleteSelf',
+                url: 'http://localhost:80/PHPStormProjects/test-exer/api/api.php?act=TaskController&method=deleteTask',
                 method:'POST',
                 params:{
                     'id':rec.get('id')
@@ -193,7 +193,7 @@ Ext.define('MyApp.view.front.MainController', {
         Ext.Msg.alert('Completed/Uncompleted', 'Completed/Uncompleted ' + rec.get('description') + ' (' + rec.get('id') + ')');
 
         Ext.Ajax.request({
-            url: 'http://localhost:80/PHPStormProjects/test-exer/api/api.php?act=Task&method=completeSelf',
+            url: 'http://localhost:80/PHPStormProjects/test-exer/api/api.php?act=TaskController&method=completeTask',
             method:'POST',
             params:{
                 'id':rec.get('id')

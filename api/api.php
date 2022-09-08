@@ -1,8 +1,13 @@
 <?php
 
 require_once ('dbconfig.php');
-require_once (__DIR__.'/models/User.php');
+
+/*
 require_once (__DIR__.'/models/Task.php');
+*/
+
+require_once (__DIR__.'/models/User.php');
+require_once (__DIR__.'/Controllers.php');
 
 ini_set('display_errors', '1');
 ini_set('display_startup_errors', '1');

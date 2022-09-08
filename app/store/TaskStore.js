@@ -7,7 +7,7 @@ Ext.define('MyApp.store.TaskStore',{
 
     proxy: {
         type: 'ajax',
-        url: `http://localhost:80/PHPStormProjects/test-exer/api/api.php?act=User&method=getTasks`,
+        url: `http://localhost:80/PHPStormProjects/test-exer/api/api.php?act=TaskController&method=getUserTasks`,
         reader: {
             type: 'json'
         }
