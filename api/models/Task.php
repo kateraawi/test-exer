@@ -1,14 +1,20 @@
 <?php
+namespace TestExer\Model;
 
 require_once (__DIR__.'/../vendor/autoload.php');
 require_once (__DIR__.'/../dto/TaskDto.php');
+require_once (__DIR__.'/../repository/TaskRepository.php');
 require_once ('User.php');
 
+use DateTime;
+use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\Common\Collections\ArrayCollection;
+use TestExer\Repository;
+use TestExer\dto\TaskDto as TaskDto;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="TestExer\Repository\TaskRepository")
  * @ORM\Table(name="tasks")
  */
 class Task
@@ -61,6 +67,22 @@ class Task
     public $users  = null;
 
     //public $repeats;
+
+    /**
+     * @ORM\Column(type="string")
+     */
+    public $created_at;
+
+    /**
+     * @ORM\Column(type="string")
+     */
+    public $updated_at;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="User", inversedBy="created")
+     * @ORM\JoinColumn(name="creator", referencedColumnName="id")
+     */
+    public $creator;
 
     function __construct()
     {
@@ -122,7 +144,7 @@ class Task
         global $em;
 
         return $em->createQueryBuilder()->select('MAX(t.group_id)')
-                ->from('Task', 't')
+                ->from(Task::class, 't')
                 ->getQuery()
                 ->getSingleScalarResult() + 1;
     }
@@ -132,7 +154,7 @@ class Task
         global $em;
         return $em->createQueryBuilder()
             ->select('t')
-            ->from('Task', 't')
+            ->from(Task::class, 't')
             ->where("t.group_id = $this->group_id")
             ->getQuery()
             ->getResult();

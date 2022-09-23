@@ -38,22 +38,47 @@ Ext.define('MyApp.view.front.Main', {
 Ext.define('MyApp.view.front.UserList', {
     extend: 'Ext.grid.Panel',
     xtype: 'newMainUserList',
-
+    id:'userListGridId',
     requires: [
-        'MyApp.store.UserStore'
+        'MyApp.store.UserStore',
+        'MyApp.view.front.MainController'
     ],
 
-    title: 'Users',
+    controller: 'maincontroller',
+
+    title: 'Пользователи',
     store: {type: 'userstore'},
 
-    initComponent: function() {
-        this.columns = [
-            {text: 'id', dataIndex: 'id'},
-            {text: 'Name', dataIndex: 'name', flex: 1}
-        ];
+    columns: [
+        {text: 'id', dataIndex: 'id'},
+        {text: 'Имя', dataIndex: 'name', flex: 1},
+        {
+            menuDisabled: true,
+            sortable: false,
+            xtype: 'actioncolumn',
+            items: ['@delete']
+        }
+    ],
 
-        this.callParent(arguments);
-    }
+    actions: {
+        addUser: {
+            iconCls: 'x-fa fa-plus',
+            tooltip: 'Добавить',
+            text: 'Добавить пользователя',
+            handler: 'onAddUserClick'
+        },
+        delete: {
+            iconCls: 'x-fa fa-ban',
+            tooltip: 'Удалить',
+            text: 'Удалить пользователя',
+            handler: 'onDeleteUserClick'
+        }
+    },
+
+    bbar: [
+        '@addUser'
+    ],
+
 });
 
 Ext.define('MyApp.view.front.TaskList', {
@@ -68,7 +93,7 @@ Ext.define('MyApp.view.front.TaskList', {
         'MyApp.view.front.MainController'
     ],
 
-    title: 'Tasks',
+    title: 'Задачи',
     id:'taskListGridId',
     store: {type: 'taskstore'},
     height: 750,
@@ -86,13 +111,6 @@ Ext.define('MyApp.view.front.TaskList', {
             //getTip: 'getBuyTip',
             handler: 'onDeleteClick'
         },
-        complete: {
-            iconCls: 'x-fa fa-check',
-            tooltip: 'Завершить/Привести в незавершенное состояние',
-            //getClass: 'getBuyClass',
-            //getTip: 'getBuyTip',
-            handler: 'onCompleteClick'
-        },
         add: {
             iconCls: 'x-fa fa-check',
             tooltip: 'Добавить',
@@ -100,28 +118,31 @@ Ext.define('MyApp.view.front.TaskList', {
             //getClass: 'getBuyClass',
             //getTip: 'getBuyTip',
             handler: 'onAddClick'
-        }
+        },
     },
 
     columns : [
             {text: 'id', dataIndex: 'id'},
-            {text: 'Group', dataIndex: 'group_id'},
-            {text: 'Description', dataIndex: 'description'},
-            {text: 'Do From', dataIndex: 'do_from', flex:1},
-            {text: 'Do To', dataIndex: 'do_to', flex:1},
-            {text: 'Completed', dataIndex: 'completed'},
-            {text: 'Users', dataIndex: 'users'},
+            {text: 'Группа', dataIndex: 'group_id'},
+            {text: 'Описание', dataIndex: 'description', align:'left', flex:1},
+            {xtype:'datecolumn', text: 'Начало', dataIndex: 'do_from', format: 'Y-m-d'},
+            {xtype:'datecolumn', text: 'Конец', dataIndex: 'do_to', format: 'Y-m-d'},
+            {xtype:'checkcolumn', text: 'Статус выполнения', dataIndex: 'completed', listeners: {checkchange: 'onCompleteClick'}},
+            {text: 'Создатель', dataIndex: 'creator'},
             {
                 menuDisabled: true,
                 sortable: false,
                 xtype: 'actioncolumn',
                 width: 75,
-                items: ['@sell', '@buy', '@complete']
+                items: ['@sell', '@buy']
             }
     ],
     bbar: [
         '@add'
-    ]
+    ],
+    listeners: {
+        select: 'onCellClick'
+    },
 });
 
 Ext.define('MyApp.view.front.LoginForm', {
@@ -193,6 +214,7 @@ Ext.define('MyApp.view.front.TaskForm', {
 Ext.define('MyApp.view.front.TaskAddForm', {
     extend: 'Ext.window.Window',
     alias: 'widget.taskaddform',
+    id:'taskView',
     controller: 'maincontroller',
     requires: ['MyApp.view.front.MainController'],
     title: 'Задание',
@@ -234,6 +256,59 @@ Ext.define('MyApp.view.front.TaskAddForm', {
                     text: 'Сохранить',
                     handler: 'onSaveAddClick'
                 }
+            ],
+        }];
+
+        this.callParent(arguments);
+    }
+});
+
+Ext.define('MyApp.view.front.UserAddForm', {
+    extend: 'Ext.window.Window',
+    alias: 'widget.useraddform',
+    controller: 'maincontroller',
+    requires: ['MyApp.view.front.MainController'],
+    title: 'Пользователь',
+    layout: 'fit',
+    autoShow: true,
+
+    initComponent: function() {
+        this.items = [{
+            xtype: 'form',
+            items: [{
+                xtype: 'textfield',
+                name : 'name',
+                fieldLabel: 'Имя'
+            },
+                {
+                    xtype: 'button',
+                    text: 'Сохранить',
+                    handler: 'onSaveAddUserClick'
+                }
+            ],
+        }];
+
+        this.callParent(arguments);
+    }
+});
+
+Ext.define('MyApp.view.front.TaskView', {
+    extend: 'Ext.window.Window',
+    alias: 'widget.taskview',
+    controller: 'maincontroller',
+    requires: ['MyApp.view.front.MainController'],
+    title: 'Задача',
+    layout: 'fit',
+    autoShow: true,
+
+    initComponent: function() {
+        this.items = [{
+            xtype: 'form',
+            items: [{
+                xtype: 'textfield',
+                name : 'name',
+                fieldLabel: 'Имя'
+            },
             ],
         }];
 

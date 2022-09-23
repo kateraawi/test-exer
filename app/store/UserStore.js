@@ -7,7 +7,7 @@ Ext.define('MyApp.store.UserStore',{
 
     proxy: {
         type: 'ajax',
-        url: 'http://localhost:80/PHPStormProjects/test-exer/api/api.php?act=User&method=getAll',
+        url: 'http://localhost:80/PHPStormProjects/test-exer/api/api.php?act=UserController&method=getAllUsers',
         reader: {
             type: 'json'
         }

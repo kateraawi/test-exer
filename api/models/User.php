@@ -1,10 +1,15 @@
 <?php
+namespace TestExer\Model;
 
 require_once (__DIR__.'/../dbconfig.php');
+require_once (__DIR__.'/../dto/UserDto.php');
 require_once ('Task.php');
+
+namespace TestExer\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use TestExer\dto\UserDto as UserDto;
 
 /**
  * @ORM\Entity
@@ -25,12 +30,17 @@ class User
      */
     public $tasks = null;
 
+    /**
+     * One product has many features. This is the inverse side.
+     * @ORM\OneToMany(targetEntity="Task", mappedBy="creator")
+     */
+    public $created;
+
     function __construct(){
 
         $this->tasks = new ArrayCollection();
+        $this->created = new ArrayCollection();
     }
-
-
 
     public function getTasks($request = null){
         global $em;
@@ -38,31 +48,8 @@ class User
         if($request){
             $this->id = $request['user_id'];
         }
-
-        return $em->find("User", $this->id)->tasks->getValues();
-    }
-
-    public function getAll()
-    {
-        global $em;
-        return $em->createQueryBuilder()->select('u')
-            ->from('User', 'u')
-            ->getQuery()
-            ->getResult();
-
-    }
-
-    function addSelf($request = null) {
-
-        global $em;
-
-        if ($request) {
-            $this->name = $request['name'];
-        }
-
-        $em->persist($this);
-        $em->flush();
-
+        $tasks = $em->find("User", $this->id)->tasks->getValues();
+        return $tasks;
     }
 
     function addTask(Task $task)
@@ -95,37 +82,10 @@ class User
         }
     }
 
-    function addTaskViaRequest($request)
+    function toDto()
     {
-        global $em;
-        $user = $em->find('User', $request['user_id']);
-        $task = $em->find('Task', $request['task_id']);
-        $user->addTask($task);
-
-    }
-
-    function addTaskGroupViaRequest($request)
-    {
-        global $em;
-        $user = $em->find('User', $request['user_id']);
-        $task = $em->find('Task', $request['task_id']);
-        $user->adTaskrGroup($task);
-    }
-
-    function unlinkTaskViaRequest($request)
-    {
-        global $em;
-        $user = $em->find('User', $request['user_id']);
-        $task = $em->find('Task', $request['task_id']);
-        $user->unlinkTask($task);
-    }
-
-    function unlinkTaskGroupViaRequest($request)
-    {
-        global $em;
-        $user = $em->find('User', $request['user_id']);
-        $task = $em->find('Task', $request['task_id']);
-        $user->unlinkTaskGroup($task);
+        $dto = new UserDto();
+        return  $dto->toDto($this);
     }
 
 }

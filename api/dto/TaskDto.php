@@ -1,5 +1,10 @@
 <?php
 
+namespace TestExer\dto;
+
+use TestExer\Model\Task as Task;
+
+
 class TaskDto
 {
     public $id;
@@ -20,6 +25,12 @@ class TaskDto
 
     public $users;
 
+    public $created_at;
+
+    public $updated_at;
+
+    public $creator;
+
     function toDto(Task $task)
     {
 
@@ -31,7 +42,9 @@ class TaskDto
         $this->completed = $task->completed;
         $this->group_id = $task->group_id;
         $this->users = $task->users;
-
+        $this->created_at = $task->created_at;
+        $this->updated_at = $task->updated_at;
+        $this->creator = $task->creator->id;
         return $this;
     }
 }
