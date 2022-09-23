@@ -1,5 +1,7 @@
 <?php
 
+namespace TestExer\Services;
+
 require_once (__DIR__.'/models/User.php');
 require_once (__DIR__.'/models/Task.php');
 require_once (__DIR__.'/vendor/autoload.php');
@@ -17,6 +19,7 @@ class TaskService
         if ($request)
         {
             $task = new Task;
+            $task->setName($request['name']);
             $task->setDescription($request['description']);
             $task->setPeriod(
                 date('Y-m-d', strtotime($request['do_from'])),
@@ -41,6 +44,7 @@ class TaskService
         global $em;
         $itask = new Task;
 
+        $itask->setName($request['name']);
         $itask->setDescription($request['description']);
         $itask->setPeriod(date('Y-m-d', strtotime($request['do_from'])),
             date('Y-m-d', strtotime($request['do_to'])),
@@ -59,6 +63,7 @@ class TaskService
         foreach ($itask->getRepeatedPeriods() as $period){
 
             $task = new Task;
+            $task->setName($itask->name);
             $task->setDescription($itask->description);
             $task->setPeriod($period[0], $period[1], $itask->period_days, $itask->period_quantity);
             $task->setCompleted(0);
@@ -130,12 +135,22 @@ class TaskService
         return $taskList;
     }
 
+    function getUserCreatedGridTasks($request)
+    {
+        global $em;
+
+        $taskList = $em->getRepository(Task::class)->getUserCreatedGridTasks($request);
+
+        return $taskList;
+    }
+
     function updateTask($request)
     {
 
         global $em;
 
-        $task = $em->find(Task::class, 366);
+        $task = $em->find(Task::class, $request['id']);
+        $task->setName($request['name']);
         $task->setDescription($request['description']);
         $task->updated_at = date('Y-m-d');
         $em->persist($task);
@@ -163,6 +178,7 @@ class TaskService
         if ($request['period_quantity'] > $thisTask->period_quantity) {
             for ($i = 0; $i < $request['period_quantity'] - $thisTask->period_quantity; $i++) {
                 $task = new Task;
+                $task->setName($request['name']);
                 $task->setDescription($request['description']);
                 $task->setCompleted(0);
                 $task->setGroupId($thisTask->group_id);
@@ -193,8 +209,9 @@ class TaskService
 
         $em->flush();
 
+        $dtos = [];
         foreach ($group as $task){
-            $task = $task->toDto();
+            $dtos[] = $task->toDto();
         }
 
         return $group;
@@ -254,7 +271,7 @@ class TaskService
             $this->id = (int)$request['id'];
         }
 
-        $thisTask = $em->find('Task', $request['id']);
+        $thisTask = $em->find(Task::class, $request['id']);
 
         if ($thisTask->group_id !== null){
             $group = $thisTask->getSelfGroup();
@@ -323,6 +340,23 @@ class UserService
         $em->flush();
 
         return $user->toDto();
+    }
+
+    function getUser($request)
+    {
+        global $em;
+
+        try {
+            $user = new User;
+            $em->find(User::class, $request['id']);
+            if ($user->id === null){
+                throw new JsonException('fsdgdfgdfg', 404);
+            }
+            return $user->toDto();
+        } catch (Exception $e){
+            header('HTTP/1.0 404 Not found', true, 404);
+            return ['code'=>$e->getCode(), 'message'=> $e->getMessage()];
+        }
     }
 
     function getAllUsers()

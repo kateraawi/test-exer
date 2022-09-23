@@ -28,6 +28,11 @@ class Task
     public $id;
 
     /**
+     * @ORM\Column(name="`name`", type="string")
+     */
+    public $name;
+
+    /**
      * @ORM\Column(name="`descr`", type="string")
      */
     public $description;
@@ -87,6 +92,11 @@ class Task
     function __construct()
     {
         $this->users = new ArrayCollection();
+    }
+
+    function setName($name)
+    {
+        $this->name = $name;
     }
 
     function setDescription($description)

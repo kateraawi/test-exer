@@ -4,7 +4,9 @@
         "doctrine/dbal": "^3.2",
         "doctrine/annotations": "1.13.2",
         "symfony/yaml": "^5.4",
-        "symfony/cache": "^5.4"
+        "symfony/cache": "^5.4",
+        "twig/twig": "^3.0",
+        "twig/cssinliner-extra": "^3.4"
     },
     "autoload": {
         "psr-0": {"": "src/"}

@@ -2,6 +2,9 @@
 
 require_once './Services.php';
 
+use TestExer\Services\TaskService as TaskService;
+use TestExer\Services\UserService as UserService;
+
 class TaskController
 {
     private $taskService;
@@ -50,6 +53,11 @@ class TaskController
     function getUserGridTasks($request)
     {
         return $this->taskService->getUserGridTasks(request: $request);
+    }
+
+    function getUserCreatedGridTasks($request)
+    {
+        return $this->taskService->getUserCreatedGridTasks(request: $request);
     }
 
     function updateTask($request)
@@ -109,6 +117,12 @@ class UserController
     function getAllUsers()
     {
         return $this->userService->getAllUsers();
+    }
+
+    function getUser($request)
+    {
+        //echo $this->userService->getUser($request);
+        return $this->userService->getUser($request);
     }
 
     function addUser($request)

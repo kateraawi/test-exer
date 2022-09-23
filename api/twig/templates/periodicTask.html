@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+{% apply inline_css(source("./styles/styles.css")) %}
+<html>
+<head>
+    <title>Отчет по периодической задаче</title>
+</head>
+<body>
+<h1>Отчет по созданным задачам</h1>
+<div>
+    <h2>Сведения о головной задаче</h2>
+    <span>id: {{ head.id }}</span><br>
+    <span>Имя: {{ head.name }}</span>
+    <span>Описание: {{ head.description }}</span>
+    <span>Перерыв между повторениями: {{ head.description }}</span>
+    <span>Количество повторений: {{ head.description }}</span>
+</div>
+<div>
+    <h2>Сведения о задаче</h2>
+    {% if tasks %}
+    <table border="1" style="border-collapse: collapse">
+        <tr>
+            <th>
+                id
+            </th>
+            <th>
+                Группа
+            </th>
+            <th>
+                Название
+            </th>
+            <th>
+                Описание
+            </th>
+            <th>
+                Начало
+            </th>
+            <th>
+                Конец
+            </th>
+            <th>
+                Статус выполнения
+            </th>
+            <th>
+                Создатель
+            </th>
+        </tr>
+        {% for task in tasks %}
+        <tr>
+            <td>
+                {{task.id}}
+            </td>
+            <td>
+                {{task.group_id}}
+            </td>
+            <td>
+                {{task.name}}
+            </td>
+            <td>
+                {{task.description}}
+            </td>
+            <td>
+                {{task.do_from}}
+            </td>
+            <td>
+                {{task.do_to}}
+            </td>
+            <td>
+                {% if task.completed == 0 %}
+                Не выполнено
+                {% else %}
+                Выполнено
+                {% endif %}
+            </td>
+            <td>
+                {{task.creator.name}} ({{task.creator.id}})
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}
+    <h2>Нет созданных задач</h2>
+    {% endif %}
+</div>
+</body>
+</html>
+{% endapply %}
