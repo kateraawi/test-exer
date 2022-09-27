@@ -230,7 +230,8 @@ Ext.define('MyApp.view.front.LoginForm', {
     extend: 'Ext.window.Window',
     alias: 'widget.loginform',
     controller: 'maincontroller',
-    requires: ['MyApp.view.front.MainController'],
+    requires: ['MyApp.view.front.MainController', 'MyApp.store.UserStore'],
+    store: {type: 'userstore'},
     title: 'Логин',
     layout: 'fit',
     autoShow: true,
@@ -239,9 +240,12 @@ Ext.define('MyApp.view.front.LoginForm', {
         this.items = [{
             xtype: 'form',
             items: [{
-                xtype: 'numberfield',
+                xtype: 'combobox',
+                store: this.store,
                 name: 'userId',
-                fieldLabel: 'ID'
+                fieldLabel: 'ID',
+                displayField: 'name',
+                valueField: 'id',
                 },
                 {
                     xtype: 'button',
@@ -261,7 +265,8 @@ Ext.define('MyApp.view.front.AttachForm', {
     extend: 'Ext.window.Window',
     alias: 'widget.attachform',
     controller: 'maincontroller',
-    requires: ['MyApp.view.front.MainController'],
+    store: {type: 'userstore'},
+    requires: ['MyApp.view.front.MainController', 'MyApp.store.UserStore'],
     title: 'Прикрепление пользователя к задаче',
     layout: 'fit',
     autoShow: true,
@@ -270,9 +275,12 @@ Ext.define('MyApp.view.front.AttachForm', {
         this.items = [{
             xtype: 'form',
             items: [{
-                xtype: 'numberfield',
+                xtype: 'combobox',
+                store: this.store,
                 name: 'userId',
-                fieldLabel: 'ID'
+                fieldLabel: 'ID',
+                displayField: 'name',
+                valueField: 'id',
             },
                 {
                     xtype: 'button',
@@ -351,12 +359,12 @@ Ext.define('MyApp.view.front.TaskAddForm', {
                 fieldLabel: 'Описание'
                 },
                 {
-                    xtype: 'textfield',
+                    xtype: 'datefield',
                     name : 'do_from',
                     fieldLabel: 'От'
                 },
                 {
-                    xtype: 'textfield',
+                    xtype: 'datefield',
                     name : 'do_to',
                     fieldLabel: 'До'
                 },

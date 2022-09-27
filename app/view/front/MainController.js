@@ -82,7 +82,7 @@ Ext.define('MyApp.view.front.MainController', {
 
                 },
                 failure: function(response, options){
-                    alert("Ошибка: " + response.statusText);
+                    Ext.Msg.alert('Ошибка!',  'Ошибка при изменении задачи!');
                 }
             });
         } else {
@@ -101,7 +101,7 @@ Ext.define('MyApp.view.front.MainController', {
                     Ext.Msg.alert('Успех', 'Успех');
                 },
                 failure: function(response, options){
-                    alert("Ошибка: " + response.statusText);
+                    Ext.Msg.alert('Ошибка!',  'Ошибка при изменении задачи!');
                 }
             });
         }
@@ -150,7 +150,7 @@ Ext.define('MyApp.view.front.MainController', {
                     Ext.Msg.alert('Успех', 'Успех');
                 },
                 failure: function(response, options){
-                    alert("Ошибка: " + response.statusText);
+                    Ext.Msg.alert('Ошибка!',  'Ошибка при прикреплении пользователя!');
                 }
             });
         } else {
@@ -167,7 +167,7 @@ Ext.define('MyApp.view.front.MainController', {
                     Ext.Msg.alert('Успех', 'Успех');
                 },
                 failure: function(response, options){
-                    alert("Ошибка: " + response.statusText);
+                    Ext.Msg.alert('Ошибка!',  'Ошибка при прикреплении пользователя!');
                 }
             });
 
@@ -209,7 +209,7 @@ Ext.define('MyApp.view.front.MainController', {
                     Ext.Msg.alert('Успех', 'Успех');
                 },
                 failure: function(response, options){
-                    alert("Ошибка: " + response.statusText);
+                    Ext.Msg.alert('Ошибка!',  'Ошибка при добавлении задачи!');
                 }
             });
 
@@ -235,7 +235,7 @@ Ext.define('MyApp.view.front.MainController', {
                 },
 
                 failure: function(response, options){
-                    alert("Ошибка: " + response.statusText);
+                    Ext.Msg.alert('Ошибка!',  'Ошибка при добавлении задачи!');
                 }
             });
         }
@@ -262,7 +262,7 @@ Ext.define('MyApp.view.front.MainController', {
                     Ext.Msg.alert('Успех', 'Успех');
                 },
                 failure: function(response, options){
-                    alert("Ошибка: " + response.statusText);
+                    Ext.Msg.alert('Ошибка!',  'Ошибка при добавлении пользователя!');
                 }
             });
 
@@ -287,7 +287,7 @@ Ext.define('MyApp.view.front.MainController', {
                         Ext.getCmp('createdTaskListGridId').getStore().load({params: {user_id: MyApp.config.Globals.getUserId()}});
                     },
                     failure: function (response, options) {
-                        alert("Ошибка: " + response.statusText);
+                        Ext.Msg.alert('Ошибка!',  'Ошибка при удалении задачи!');
                     }
                 });
             }
@@ -313,7 +313,7 @@ Ext.define('MyApp.view.front.MainController', {
                     Ext.getCmp('userListGridId').getStore().load();
                 },
                 failure: function(response, options){
-                    alert("Ошибка: " + response.statusText);
+                    Ext.Msg.alert('Ошибка!',  'Ошибка при удалении пользователя!');
                 }
             });
         }
@@ -334,7 +334,7 @@ Ext.define('MyApp.view.front.MainController', {
                     Ext.getCmp('createdTaskListGridId').getStore().load({params: {user_id: MyApp.config.Globals.getUserId()}});
                 },
                 failure: function (response, options) {
-                    alert("Ошибка: " + response.statusText);
+                    Ext.Msg.alert('Ошибка!',  'Ошибка при завершении задачи!');
                 }
             });
         } else {
@@ -343,9 +343,6 @@ Ext.define('MyApp.view.front.MainController', {
     },
 
     onCellClick: function(sender, record){
-        //alert(record.id);
-        //let view = Ext.widget('taskview');
-        //Ext.getCmp('taskView').setTitle(`Задачи пользователя`);
         Ext.Ajax.request({
             method : "POST",
             url: 'http://localhost:80/PHPStormProjects/test-exer/api/api.php?act=TaskController&method=getTask&id='+ record.id,
@@ -396,48 +393,6 @@ Ext.define('MyApp.view.front.MainController', {
                             pack  : 'start',
                         },
                         items: [
-                            /*{
-                            xtype: 'grid',
-                            border: true,
-                            title: 'Сведения',
-                            columns: [
-                                {
-                                    text     : 'id',
-                                    flex     : 1,
-                                    sortable : true,
-                                    dataIndex: 'id'
-                                },
-                                {
-                                    text     : 'Описание',
-                                    cellWrap: true,
-                                    align: 'left',
-                                    width    : 300,
-                                    sortable : true,
-                                    dataIndex: 'description'
-                                },
-                                ],                 // One header just for show. There's no data,
-                            store: taskStore
-                            },
-                            {
-                                xtype: 'grid',
-                                border: true,
-                                title: 'Создатель',
-                                columns: [
-                                    {
-                                        text     : 'id',
-                                        flex     : 1,
-                                        sortable : true,
-                                        dataIndex: 'id'
-                                    },
-                                    {
-                                        text     : 'Имя',
-                                        align: 'left',
-                                        width    : 300,
-                                        sortable : true,
-                                        dataIndex: 'name'
-                                    }],
-                                store: creatorStore
-                            },*/
                             {
                                 xtype: 'panel',
                                 border: true,
@@ -478,11 +433,11 @@ Ext.define('MyApp.view.front.MainController', {
                         ]
                     }).show();
                 } else {
-                    alert("Invalid response")
+                    Ext.Msg.alert('Ошибка!',  'Ошибка при получении задачи!');
                 }
             },
             failure : function(response) {
-                alert("Data request failed");
+                Ext.Msg.alert('Ошибка!',  'Ошибка при получении задачи!');
             }
         });
     }
