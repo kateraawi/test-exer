@@ -50,4 +50,21 @@ class TwigService
 
         return ['user'=>(array)$user, 'tasks'=>$newTaskList];
     }
+
+    function periodicTask($request)
+    {
+        global $em;
+
+        $task = $em->find(Task::class, $request['id']);
+
+        $head = $em->find(Task::class, $em->createQueryBuilder()->select('MIN(t.id)')
+            ->from(Task::class, 't')
+            ->where("t.group_id = $task->group_id")
+            ->getQuery()
+            ->getSingleScalarResult());
+
+        $repeats = $em->getRepository(Task::class)->getGroupRepeats(['id'=>$task->group_id]);
+
+        return ['head' => $task, 'repeats' => $repeats];
+    }
 }

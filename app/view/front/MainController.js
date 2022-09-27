@@ -387,7 +387,7 @@ Ext.define('MyApp.view.front.MainController', {
                         },});
                     //console.log(obj)
                     Ext.create('Ext.window.Window', {
-                        title: 'Задача',
+                        title: `Задача #${obj.id}`,
                         height: 500,
                         width: 400,
                         layout: {
@@ -395,7 +395,8 @@ Ext.define('MyApp.view.front.MainController', {
                         align : 'stretch',
                             pack  : 'start',
                         },
-                        items: [{
+                        items: [
+                            /*{
                             xtype: 'grid',
                             border: true,
                             title: 'Сведения',
@@ -436,6 +437,22 @@ Ext.define('MyApp.view.front.MainController', {
                                         dataIndex: 'name'
                                     }],
                                 store: creatorStore
+                            },*/
+                            {
+                                xtype: 'panel',
+                                border: true,
+                                title: 'Сведения',
+                                html:`
+                                    <div style="font-size: 14px; padding: 10px">
+                                        Добавлен: ${obj.creator.name} <br>
+                                        в ${obj.created_at} <br>
+                                        Последнее редактирование: ${obj.updated_at} <br>
+                                        Выполнить в срок: ${obj.do_from} – ${obj.do_to} <br>
+                                        Статус: ${obj.completed === 1 ? 'Выполнено' : 'Не выполнено'} <br><br>
+                                        Тема: ${obj.name} <br>
+                                        Описание: <p> ${obj.description} </p>
+                                    </div>
+                                `,
                             },
                             {
                                 xtype: 'grid',

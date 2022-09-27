@@ -1,86 +1,63 @@
 <!DOCTYPE html>
-{% apply inline_css(source("./styles/styles.css")) %}
 <html>
 <head>
-    <title>Отчет по периодической задаче</title>
+<title>
+{% block title %}Отчет по периодической задаче #{{ head.id }}{% endblock %}
+</title>
 </head>
 <body>
-<h1>Отчет по созданным задачам</h1>
+{% block body %}
+<font size="14">
+Отчет по периодической задаче</font><br>
 <div>
-    <h2>Сведения о головной задаче</h2>
-    <span>id: {{ head.id }}</span><br>
-    <span>Имя: {{ head.name }}</span>
-    <span>Описание: {{ head.description }}</span>
-    <span>Перерыв между повторениями: {{ head.description }}</span>
-    <span>Количество повторений: {{ head.description }}</span>
+<font size="12">
+Основные сведения</font><br>
+<span>id: {{ head.id }}</span><br>
+<span>Имя: {{ head.name }}</span><br>
+<span>Описание: {{ head.description }}</span><br>
+<span>Перерыв между повторениями: {{ head.period_days }}</span><br>
+<span>Количество повторений: {{ head.period_quantity }}</span><br><br>
+<span>Создано: {{ head.creator.name }} ({{ head.creator.id }})</span><br>
+<span>В: {{ head.created_at }}</span><br>
+<span>Последнее изменение: {{ head.updated_at }}</span><br>
 </div>
 <div>
-    <h2>Сведения о задаче</h2>
-    {% if tasks %}
-    <table border="1" style="border-collapse: collapse">
-        <tr>
-            <th>
-                id
-            </th>
-            <th>
-                Группа
-            </th>
-            <th>
-                Название
-            </th>
-            <th>
-                Описание
-            </th>
-            <th>
-                Начало
-            </th>
-            <th>
-                Конец
-            </th>
-            <th>
-                Статус выполнения
-            </th>
-            <th>
-                Создатель
-            </th>
-        </tr>
-        {% for task in tasks %}
-        <tr>
-            <td>
-                {{task.id}}
-            </td>
-            <td>
-                {{task.group_id}}
-            </td>
-            <td>
-                {{task.name}}
-            </td>
-            <td>
-                {{task.description}}
-            </td>
-            <td>
-                {{task.do_from}}
-            </td>
-            <td>
-                {{task.do_to}}
-            </td>
-            <td>
-                {% if task.completed == 0 %}
-                Не выполнено
-                {% else %}
-                Выполнено
-                {% endif %}
-            </td>
-            <td>
-                {{task.creator.name}} ({{task.creator.id}})
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-    {% else %}
-    <h2>Нет созданных задач</h2>
-    {% endif %}
+<font size="12">Сведения о повторениях:</font><br>
+{% if repeats %}
+<table border="1" style="border-collapse: collapse">
+<tr>
+<td>
+id
+</td>
+<td>
+Начало – Конец
+</td>
+<td>
+Статус
+</td>
+</tr>
+{% for repeat in repeats %}
+<tr>
+<td>
+{{repeat.id}}
+</td>
+<td>
+{{repeat.do_from}} – {{repeat.do_to}}
+</td>
+<td>
+{% if task.completed == 0 %}
+Не выполнено
+{% else %}
+Выполнено
+{% endif %}
+</td>
+</tr>
+{% endfor %}
+</table>
+{% else %}
+<h2>Нет созданных задач</h2>
+{% endif %}
 </div>
+{% endblock %}
 </body>
 </html>
-{% endapply %}

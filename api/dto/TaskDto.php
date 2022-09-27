@@ -41,6 +41,7 @@ class TaskDto
         $this->description = $task->description;
         $this->do_from = $task->do_from;
         $this->do_to = $task->do_to;
+        $this->period_quantity = $task->period_quantity;
         $this->period_days = $task->period_days;
         $this->completed = $task->completed;
         $this->group_id = $task->group_id;
@@ -48,6 +49,7 @@ class TaskDto
         $this->created_at = $task->created_at;
         $this->updated_at = $task->updated_at;
         $this->creator = $task->creator->toDto();
+
         return $this;
     }
 }

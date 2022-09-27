@@ -436,36 +436,3 @@ Ext.define('MyApp.view.front.TaskView', {
         this.callParent(arguments);
     }
 });
-
-Ext.define('MyApp.view.form.Date', {
-    extend: 'Ext.container.Container',
-    xtype: 'form-date',
-
-    requires: [
-        'Ext.panel.Panel',
-        'Ext.picker.Date',
-        'Ext.picker.Month',
-        'Ext.layout.container.VBox',
-        'Ext.layout.container.HBox'
-    ],
-
-    width: 750,
-    layout: {
-        type: 'vbox',
-        align: 'center'
-    },
-
-    items: [{
-        xtype: 'container',
-        layout: 'hbox',
-        items: [{
-            title: 'Date Picker (no today)',
-            margin: '0 20 0 0',
-            items: {
-                xtype: 'datepicker',
-                showToday: false,
-                handler: 'onDatePicked'
-            }
-        }]
-    }]
-});

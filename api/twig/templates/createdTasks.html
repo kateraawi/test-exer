@@ -1,95 +1,80 @@
 <!DOCTYPE html>
-{% apply inline_css(source("./styles/styles.css")) %}
+
 <html>
 <head>
-    <title>Отчет по созданным задачам</title>
+<title>{% block title %}Отчет по созданным задачам{% endblock %}</title>
 </head>
 <body>
-<h1>Отчет по созданным задачам</h1>
+{% block body %}
+<font size="14">Отчет по созданным задачам</font><br>
 <div>
-    <h2>Сведения о пользователе</h2>
-    <span>id: {{ user.id }}</span><br>
-    <span>Имя: {{ user.name }}</span>
+<font size="12">Сведения о пользователе</font><br>
+<span>id: {{ user.id }}</span><br>
+<span>Имя: {{ user.name }}</span><br>
 </div>
 <div>
-    <h2>Сведения о задачах</h2>
-    {% if tasks %}
-    <table border="1" style="border-collapse: collapse">
-        <tr>
-            <th>
-                id
-            </th>
-            <th>
-                Группа
-            </th>
-            <th>
-                Название
-            </th>
-            <th>
-                Описание
-            </th>
-            <th>
-                Начало
-            </th>
-            <th>
-                Конец
-            </th>
-            <th>
-                Статус выполнения
-            </th>
-            <th>
-                Создатель
-            </th>
-            <th>
-                Участники
-            </th>
-        </tr>
-        {% for task in tasks %}
-        <tr>
-            <td>
-                {{task.id}}
-            </td>
-            <td>
-                {{task.group_id}}
-            </td>
-            <td>
-                {{task.name}}
-            </td>
-            <td>
-                {{task.description}}
-            </td>
-            <td>
-                {{task.do_from}}
-            </td>
-            <td>
-                {{task.do_to}}
-            </td>
-            <td>
-                {% if task.completed == 0 %}
-                Не выполнено
-                {% else %}
-                Выполнено
-                {% endif %}
-            </td>
-            <td>
-                {{task.creator.name}} ({{task.creator.id}})
-            </td>
-            <td>
-                {% if task.users %}
-                    {% for user in task.users %}
-                        {{user.name}} ({{user.id}}) <br>
-                    {% endfor %}
-                {% else %}
-                    К задаче не прикреплены участники
-                {% endif %}
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
-    {% else %}
-        <h2>Нет созданных задач</h2>
-    {% endif %}
+<font size="12">Сведения о задачах</font><br>
+{% if tasks %}
+<table border="1" style="border-collapse: collapse">
+<tr>
+<td>
+id
+</td>
+<td>
+Группа
+</td>
+<td>
+Название
+</td>
+<td>
+Начало – Конец
+</td>
+<td>
+Статус выполнения
+</td>
+<td>
+Создатель
+</td>
+</tr>
+{% for task in tasks %}
+<tr>
+<td>
+{{task.id}}
+</td>
+<td>
+{% if task.group_id %}
+{{task.group_id}}
+{% else %}
+Н/П
+{% endif %}
+</td>
+<td>
+{% if task.name %}
+{{task.name}}
+{% else %}
+Н/Н
+{% endif %}
+</td>
+<td>
+{{task.do_from}} – {{task.do_to}}
+</td>
+<td>
+{% if task.completed == 0 %}
+Не выполнено
+{% else %}
+Выполнено
+{% endif %}
+</td>
+<td>
+{{task.creator.name}} ({{task.creator.id}})
+</td>
+</tr>
+{% endfor %}
+</table>
+{% else %}
+<h2>Нет созданных задач</h2>
+{% endif %}
 </div>
+{% endblock %}
 </body>
 </html>
-{% endapply %}

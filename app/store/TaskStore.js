@@ -2,7 +2,7 @@ Ext.define('MyApp.store.TaskStore',{
     requires: ['MyApp.config.Globals'],
     extend: 'Ext.data.Store',
     model: 'MyApp.model.Task',
-    data:[{'id':-1, 'name': 'Для получения списка задач следует авторизоваться'}],
+    data:[],
     //autoLoad: true,
     alias: 'store.taskstore',
 
@@ -19,7 +19,7 @@ Ext.define('MyApp.store.CreatedTaskStore',{
     requires: ['MyApp.config.Globals'],
     extend: 'Ext.data.Store',
     model: 'MyApp.model.Task',
-    data:[{'id':-1, 'name': 'Для получения списка задач следует авторизоваться'}],
+    data:[],
     //autoLoad: true,
     alias: 'store.createdtaskstore',
 
