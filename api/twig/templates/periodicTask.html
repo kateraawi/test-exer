@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>
+{% block title %}Отчет по периодической задаче #{{ head.id }}{% endblock %}
+</title>
+</head>
+<body>
+{% block body %}
+<font size="14">
+Отчет по периодической задаче</font><br>
+<div>
+<font size="12">
+Основные сведения</font><br>
+<span>id: {{ head.id }}</span><br>
+<span>Имя: {{ head.name }}</span><br>
+<span>Описание: {{ head.description }}</span><br>
+<span>Перерыв между повторениями: {{ head.period_days }}</span><br>
+<span>Количество повторений: {{ head.period_quantity }}</span><br><br>
+<span>Создано: {{ head.creator.name }} ({{ head.creator.id }})</span><br>
+<span>В: {{ head.created_at }}</span><br>
+<span>Последнее изменение: {{ head.updated_at }}</span><br>
+</div>
+<div>
+<font size="12">Сведения о повторениях:</font><br>
+{% if repeats %}
+<table border="1" style="border-collapse: collapse">
+<tr>
+<td>
+id
+</td>
+<td>
+Начало – Конец
+</td>
+<td>
+Статус
+</td>
+</tr>
+{% for repeat in repeats %}
+<tr>
+<td>
+{{repeat.id}}
+</td>
+<td>
+{{repeat.do_from}} – {{repeat.do_to}}
+</td>
+<td>
+{% if task.completed == 0 %}
+Не выполнено
+{% else %}
+Выполнено
+{% endif %}
+</td>
+</tr>
+{% endfor %}
+</table>
+{% else %}
+<h2>Нет созданных задач</h2>
+{% endif %}
+</div>
+{% endblock %}
+</body>
+</html>

@@ -1,118 +1,91 @@
 <?php
+namespace TestExer\Model;
 
 require_once (__DIR__.'/../dbconfig.php');
+require_once (__DIR__.'/../dto/UserDto.php');
 require_once ('Task.php');
 
+namespace TestExer\Model;
+
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\ORM\Mapping as ORM;
+use TestExer\dto\UserDto as UserDto;
+
+/**
+ * @ORM\Entity
+ * @ORM\Table(name="users")
+ */
 class User
 {
+    /** @ORM\Id @ORM\Column(type="integer") @ORM\GeneratedValue */
     public $id;
+
+    /** @ORM\Column(type="string") */
     public $name;
-    public $tasks;
 
-    function __construct($id = null, $name = null){
-       $this->id = $id;
-       $this->name = $name;
-    }
+    /**
+     * @ORM\ManyToMany(targetEntity="Task")
+     * @ORM\JoinTable(name="users_tasks")
+     * @ORM\JoinColumn(name="task_id", referencedColumnName="id")
+     */
+    public $tasks = null;
 
-    function dbConstruct(){
-        global $connection;
-        $result = mysqli_query($connection, "SELECT * FROM users WHERE id = $this->id");
-        $result = mysqli_fetch_assoc($result);
-        $this->id = $result['id'];
-        $this->name = $result['name'];
-        $this->tasks = $this->getTasks();
+    /**
+     * One product has many features. This is the inverse side.
+     * @ORM\OneToMany(targetEntity="Task", mappedBy="creator")
+     */
+    public $created;
+
+    function __construct(){
+
+        $this->tasks = new ArrayCollection();
+        $this->created = new ArrayCollection();
     }
 
     public function getTasks($request = null){
-        global $connection;
+        global $em;
 
-        if ($request) {
-            $this->id = (int)$request['user_id'];
+        if($request){
+            $this->id = $request['user_id'];
         }
-
-        $tasks = [];
-
-        $stmt = $connection->prepare(file_get_contents(__DIR__.'/../SQL/getJoinedTasksFromUser.sql'));
-        $stmt->bind_param("i", $this->id);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        while ($row = $result->fetch_assoc()){
-            $task = new Task($row['task_id']);
-            $task->dbConstruct();
-            array_push($tasks, $task);
-        }
-
+        $tasks = $em->find("User", $this->id)->tasks->getValues();
         return $tasks;
     }
 
-    public function getAll()
+    function addTask(Task $task)
     {
-        global $connection;
-        try {
+        global $em;
+        $this->tasks[] = $task;
+        $em->flush($this);
+    }
 
-            $users = [];
-
-            $connection->begin_transaction();
-            $stmt = $connection->prepare("SELECT * FROM users");
-
-            $stmt->execute();
-
-            $result = $stmt->get_result();
-            while ($row = $result->fetch_assoc()){
-                $user = new User($row['id']);
-                $user->dbConstruct();
-                array_push($users, $user);
-            }
-
-            return $users;
-
-        } catch (Exception $e) {
-            $connection->rollBack();
-            echo "Ошибка: " . $e->getMessage();
+    function addTaskGroup(Task $task)
+    {
+        $group = $task->getSelfGroup();
+        foreach ($group as $gtask){
+            $this->addTask($gtask);
         }
     }
 
-    function addSelf() {
-        global $connection;
-        try {
-            $connection->begin_transaction();
-            $stmt = $connection->prepare(file_get_contents(__DIR__ . '/../SQL/addUser.sql'));
-            $stmt->bind_param("s", $this->name);
-            $stmt->execute();
-            $connection->commit();
-        } catch (Exception $e) {
-            $connection->rollBack();
-            echo "Ошибка: " . $e->getMessage();
-        }
-
+    function unlinkTask(Task $task)
+    {
+        global $em;
+        $this->tasks->removeElement($task);
+        $em->flush();
     }
 
-    function addTask($taskId){
-        global $connection;
-        $result = mysqli_query($connection, "SELECT * FROM users_tasks WHERE user_id=$this->id AND task_id=$taskId");
-        $result = mysqli_fetch_assoc($result);
-        if ($result == null) {
-            mysqli_query($connection, "INSERT INTO users_tasks (user_id, task_id) VALUES ($this->id, $taskId)");
+    function unlinkTaskGroup(Task $task)
+    {
+        $group = $task->getSelfGroup();
+        foreach ($group as $gtask){
+            $this->unlinkTask($gtask);
         }
     }
 
-    function unlinkTask($taskId){
-        global $connection;
-        try {
-            $connection->begin_transaction();
-            $stmt = $connection->prepare("DELETE FROM users_tasks WHERE user_id=$this->id AND task_id=$taskId");
-            $stmt->execute();
-            $connection->commit();
-        } catch (Exception $e) {
-            $connection->rollBack();
-            echo "Ошибка: " . $e->getMessage();
-        }
-
+    function toDto()
+    {
+        $dto = new UserDto();
+        return  $dto->toDto($this);
     }
 
 }
-
-//getNamesByTaskId
-//
-//CRUD
